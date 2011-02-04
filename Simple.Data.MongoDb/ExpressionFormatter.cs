@@ -8,6 +8,7 @@ using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using System.Collections;
 using MongoDB.Bson.DefaultSerializer;
+using System.Text.RegularExpressions;
 
 namespace Simple.Data.MongoDb
 {
@@ -22,6 +23,8 @@ namespace Simple.Data.MongoDb
             {
                 case SimpleExpressionType.Equal:
                     return EqualExpression(expression);
+                case SimpleExpressionType.Like:
+                    return LikeExpression(expression);
             }
 
             throw new NotSupportedException();
@@ -43,6 +46,12 @@ namespace Simple.Data.MongoDb
                 return Query.In(fieldName, new BsonArray(list.OfType<object>()));
 
             return Query.EQ(fieldName, BsonValue.Create(FormatObject(expression.RightOperand)));
+        }
+
+        private QueryComplete LikeExpression(SimpleExpression expression)
+        {
+            if (!(expression.RightOperand is string)) throw new InvalidOperationException("Cannot use Like on non-string type.");
+            return Query.Matches((string)FormatObject(expression.LeftOperand), new BsonRegularExpression((string)FormatObject(expression.RightOperand)));
         }
 
         private object FormatObject(object operand)
