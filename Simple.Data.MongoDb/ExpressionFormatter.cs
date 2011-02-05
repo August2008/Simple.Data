@@ -17,7 +17,10 @@ namespace Simple.Data.MongoDb
         private static readonly Dictionary<string, Func<DynamicReference, SimpleFunction, QueryComplete>> _supportedFunctions =
             new Dictionary<string, Func<DynamicReference, SimpleFunction, QueryComplete>>(StringComparer.InvariantCultureIgnoreCase)
             {
-                { "like", HandleLike }
+                { "like", HandleLike },
+                { "startswith", HandleStartsWith },
+                { "contains", HandleContains },
+                { "endswith", HandleEndsWith }
             };
 
         public ExpressionFormatter()
@@ -145,6 +148,27 @@ namespace Simple.Data.MongoDb
                 return Query.Matches((string)FormatObject(reference), new BsonRegularExpression((string)FormatObject(function.Args[0])));
 
             throw new InvalidOperationException("Like can only be used with a string or Regex.");
+        }
+
+        private static QueryComplete HandleStartsWith(DynamicReference reference, SimpleFunction function)
+        {
+            if(!(function.Args[0] is string)) throw new InvalidOperationException("StartsWith can only be used with a string.");
+         
+            return Query.Matches((string)FormatObject(reference), new BsonRegularExpression("^" + (string)function.Args[0] + ".*"));
+        }
+
+        private static QueryComplete HandleContains(DynamicReference reference, SimpleFunction function)
+        {
+            if (!(function.Args[0] is string)) throw new InvalidOperationException("StartsWith can only be used with a string.");
+
+            return Query.Matches((string)FormatObject(reference), new BsonRegularExpression("^.*" + (string)function.Args[0] + ".*$"));
+        }
+
+        private static QueryComplete HandleEndsWith(DynamicReference reference, SimpleFunction function)
+        {
+            if (!(function.Args[0] is string)) throw new InvalidOperationException("StartsWith can only be used with a string.");
+
+            return Query.Matches((string)FormatObject(reference), new BsonRegularExpression(".*" + (string)function.Args[0] + "$"));
         }
     }
 }

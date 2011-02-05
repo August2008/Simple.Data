@@ -110,6 +110,30 @@ namespace Simple.Data.MongoDbTest
         }
 
         [Test]
+        public void TestStartsWith()
+        {
+            var db = DatabaseHelper.Open();
+            IEnumerable<User> users = db.Users.FindAll(db.Users.Name.StartsWith("D")).Cast<User>();
+            Assert.AreEqual(1, users.Count());
+        }
+
+        [Test]
+        public void TestContains()
+        {
+            var db = DatabaseHelper.Open();
+            IEnumerable<User> users = db.Users.FindAll(db.Users.Name.Contains("a")).Cast<User>();
+            Assert.AreEqual(2, users.Count());
+        }
+
+        [Test]
+        public void TestEndsWith()
+        {
+            var db = DatabaseHelper.Open();
+            IEnumerable<User> users = db.Users.FindAll(db.Users.Name.EndsWith("b")).Cast<User>();
+            Assert.AreEqual(1, users.Count());
+        }
+
+        [Test]
         public void TestNestedDocuments()
         {
             var db = DatabaseHelper.Open();
