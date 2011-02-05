@@ -112,10 +112,24 @@ namespace Simple.Data.MongoDb
             var reference = operand as DynamicReference;
             if (!ReferenceEquals(reference, null))
             {
-                var name = reference.GetName();
-                return name == "Id" ? "_id" : name;
+                return GetFullDynamicReference(reference);
             }
             return operand;
+        }
+
+        private string GetFullDynamicReference(DynamicReference reference)
+        {
+            var names = new Stack<string>();
+            string name;
+            while(!ReferenceEquals(reference.GetOwner(), null))
+            {
+                name = reference.GetName();
+                name = name == "Id" ? "_id" : name;
+                names.Push(name);
+                
+                reference = reference.GetOwner();
+            }
+            return string.Join(".", names.ToArray());
         }
     }
 }

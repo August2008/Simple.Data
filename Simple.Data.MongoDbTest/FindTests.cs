@@ -110,6 +110,14 @@ namespace Simple.Data.MongoDbTest
         }
 
         [Test]
+        public void TestNestedDocuments()
+        {
+            var db = DatabaseHelper.Open();
+            IEnumerable<User> users = db.Users.FindAll(db.Users.Address.State == "TX").Cast<User>();
+            Assert.AreEqual(2, users.Count());
+        }
+
+        [Test]
         public void TestAllCount()
         {
             var db = DatabaseHelper.Open();
