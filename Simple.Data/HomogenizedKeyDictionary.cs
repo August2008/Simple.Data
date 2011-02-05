@@ -28,7 +28,7 @@ namespace Simple.Data
         /// <param name="source">The initial data.</param>
         public HomogenizedKeyDictionary(IEnumerable<KeyValuePair<string,object >> source)
         {
-            _internalDictionary = source.ToDictionary(kvp => kvp.Key.Homogenize(), kvp => DbNullToClrNull(kvp.Value));
+            _internalDictionary = source.ToDictionary(kvp => kvp.Key.Homogenize(), kvp => HomogenizeValue(kvp.Value));
         }
 
         /// <summary>
@@ -210,12 +210,16 @@ namespace Simple.Data
 
         private static KeyValuePair<string,object> Homogenize(KeyValuePair<string,object> original)
         {
-            return new KeyValuePair<string, object>(original.Key.Homogenize(), DbNullToClrNull(original.Value));
+            return new KeyValuePair<string, object>(original.Key.Homogenize(), HomogenizeValue(original.Value));
         }
 
-        private static object DbNullToClrNull(object source)
+        private static object HomogenizeValue(object value)
         {
-            return source == DBNull.Value ? null : source;
+            var dict = value as IDictionary<string, object>;
+            if (dict != null)
+                return new HomogenizedKeyDictionary(dict);
+
+            return value == DBNull.Value ? null : value;
         }
     }
 }

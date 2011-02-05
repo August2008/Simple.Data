@@ -32,11 +32,24 @@ namespace Simple.Data
 
         public bool TryCreate(IDictionary<string, object> data, out object result)
         {
+            return TryCreate(_concreteType, data, out result);
+        }
+
+        private bool TryCreate(Type concreteType, IDictionary<string, object> data, out object result)
+        {
             bool anyPropertiesSet = false;
-            object obj = Activator.CreateInstance(_concreteType);
-            foreach (var propertyInfo in _concreteType.GetProperties().Where(pi => CanSetProperty(pi, data)))
+            object obj = Activator.CreateInstance(concreteType);
+            object value;
+            foreach (var propertyInfo in concreteType.GetProperties().Where(pi => CanSetProperty(pi, data)))
             {
-                propertyInfo.SetValue(obj, data[propertyInfo.Name.Homogenize()], null);
+                value = data[propertyInfo.Name.Homogenize()];
+                var subData = value as IDictionary<string, object>;
+                if (subData != null)
+                {
+                    if (!TryCreate(propertyInfo.PropertyType, subData, out value))
+                        continue;
+                }
+                propertyInfo.SetValue(obj, value, null);
                 anyPropertiesSet = true;
             }
 

@@ -26,7 +26,8 @@ namespace Simple.Data.MongoDb
             var query = _expressionFormatter.Format(criteria);
 
             var collection = GetCollection(collectionName);
-            return collection.Find(query).Select(x => x.ToDictionary());
+            var dict = collection.Find(query).Select(x => x.ToDictionary());
+            return dict;
         }
 
         public IEnumerable<IDictionary<string, object>> FindAll(string collectionName)

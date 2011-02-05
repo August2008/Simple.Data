@@ -11,7 +11,7 @@ namespace Simple.Data.MongoDb
     {
         public static IDictionary<string, object> ToDictionary(this BsonDocument document)
         {
-            return document.Elements.ToDictionary(x => x.Name, x => x.Value.RawValue);
+            return document.Elements.ToDictionary(x => x.Name, x => x.Value.IsBsonDocument ? x.Value.AsBsonDocument.ToDictionary() : x.Value.RawValue);
         }
     }
 }

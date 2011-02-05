@@ -9,7 +9,7 @@ using MongoDB.Driver;
 namespace Simple.Data.MongoDb
 {
     [Export("MongoDb", typeof(Adapter))]
-    internal class MongoAdapter : Adapter
+    internal class MongoAdapter : Adapter, IAdapterWithRelation
     {
         private MongoDatabase _database;
 
@@ -59,6 +59,16 @@ namespace Simple.Data.MongoDb
             if (settingsKeys.Contains("ConnectionString"))
                 _database = MongoDatabase.Create(Settings.ConnectionString);
             
+        }
+
+        public bool IsValidRelation(string tableName, string relatedTableName)
+        {
+            return true;
+        }
+
+        public IEnumerable<IDictionary<string, object>> FindRelated(string tableName, IDictionary<string, object> row, string relatedTableName)
+        {
+            return null;
         }
     }
 }
