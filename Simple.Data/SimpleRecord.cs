@@ -54,6 +54,10 @@ namespace Simple.Data
             if (_data.ContainsKey(binder.Name))
             {
                 result = _data[binder.Name];
+                var subRecord = result as HomogenizedKeyDictionary;
+                if (subRecord != null)
+                    result = new SimpleRecord(subRecord);
+
                 return true;
             }
             if (_tableName == null)
