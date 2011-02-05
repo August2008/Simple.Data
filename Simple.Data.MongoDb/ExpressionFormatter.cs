@@ -14,6 +14,12 @@ namespace Simple.Data.MongoDb
 {
     class ExpressionFormatter : IExpressionFormatter
     {
+        private static readonly Dictionary<string, Func<DynamicReference, SimpleFunction, QueryComplete>> _supportedFunctions =
+            new Dictionary<string, Func<DynamicReference, SimpleFunction, QueryComplete>>(StringComparer.InvariantCultureIgnoreCase)
+            {
+                { "like", HandleLike }
+            };
+
         public ExpressionFormatter()
         { }
 
@@ -33,12 +39,10 @@ namespace Simple.Data.MongoDb
                     return BinaryExpression(expression, Query.LT);
                 case SimpleExpressionType.LessThanOrEqual:
                     return BinaryExpression(expression, Query.LTE);
-                case SimpleExpressionType.Like:
-                    return LikeExpression(expression);
+                case SimpleExpressionType.Function:
+                    return FunctionExpression(expression);
                 case SimpleExpressionType.NotEqual:
                     return NotEqualExpression(expression);
-                case SimpleExpressionType.NotLike:
-                    return NotLikeExpression(expression);
                 case SimpleExpressionType.Or:
                     return LogicalExpression(expression, (l, r) => Query.Or(l,r));
             }
@@ -71,14 +75,16 @@ namespace Simple.Data.MongoDb
             return Query.EQ(fieldName, BsonValue.Create(FormatObject(expression.RightOperand)));
         }
 
-        private QueryComplete LikeExpression(SimpleExpression expression)
+        private QueryComplete FunctionExpression(SimpleExpression expression)
         {
-            if (expression.RightOperand is Regex)
-                return Query.Matches((string)FormatObject(expression.LeftOperand), new BsonRegularExpression((Regex)expression.RightOperand));
-            else if (expression.RightOperand is string)
-                return Query.Matches((string)FormatObject(expression.LeftOperand), new BsonRegularExpression((string)FormatObject(expression.RightOperand)));
+            var function = expression.RightOperand as SimpleFunction;
+            if (function == null) throw new InvalidOperationException("Expected SimpleFunction as the right operand.");
 
-            throw new InvalidOperationException("Like can only be used with a string or Regex.");
+            Func<DynamicReference, SimpleFunction, QueryComplete> handler;
+            if(!_supportedFunctions.TryGetValue(function.Name, out handler))
+                throw new NotSupportedException(string.Format("Unknown function '{0}'.", function.Name));
+
+            return handler((DynamicReference)expression.LeftOperand, function);
         }
 
         private QueryComplete LogicalExpression(SimpleExpression expression, Func<QueryComplete, QueryComplete, QueryComplete> builder)
@@ -106,12 +112,7 @@ namespace Simple.Data.MongoDb
             return Query.NE(fieldName, BsonValue.Create(FormatObject(expression.RightOperand)));
         }
 
-        private QueryComplete NotLikeExpression(SimpleExpression expression)
-        {
-            throw new NotSupportedException("Not Like is not a supported operation.");
-        }
-
-        private object FormatObject(object operand)
+        private static object FormatObject(object operand)
         {
             var reference = operand as DynamicReference;
             if (!ReferenceEquals(reference, null))
@@ -121,7 +122,7 @@ namespace Simple.Data.MongoDb
             return operand;
         }
 
-        private string GetFullDynamicReference(DynamicReference reference)
+        private static string GetFullDynamicReference(DynamicReference reference)
         {
             var names = new Stack<string>();
             string name;
@@ -134,6 +135,16 @@ namespace Simple.Data.MongoDb
                 reference = reference.GetOwner();
             }
             return string.Join(".", names.ToArray());
+        }
+
+        private static QueryComplete HandleLike(DynamicReference reference, SimpleFunction function)
+        {
+            if (function.Args[0] is Regex)
+                return Query.Matches((string)FormatObject(reference), new BsonRegularExpression((Regex)function.Args[0]));
+            else if (function.Args[0] is string)
+                return Query.Matches((string)FormatObject(reference), new BsonRegularExpression((string)FormatObject(function.Args[0])));
+
+            throw new InvalidOperationException("Like can only be used with a string or Regex.");
         }
     }
 }
