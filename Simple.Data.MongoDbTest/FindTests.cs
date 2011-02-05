@@ -38,10 +38,74 @@ namespace Simple.Data.MongoDbTest
         }
 
         [Test]
-        public void TestFindAllByPartialName()
+        public void TestAnd()
+        {
+            var db = DatabaseHelper.Open();
+            IEnumerable<User> users = db.Users.FindAll(db.Users.Age > 32 & db.Users.Name == "Dave").Cast<User>();
+            Assert.AreEqual(1, users.Count());
+        }
+
+        [Test]
+        public void TestGreaterThan()
+        {
+            var db = DatabaseHelper.Open();
+            IEnumerable<User> users = db.Users.FindAll(db.Users.Age > 32).Cast<User>();
+            Assert.AreEqual(2, users.Count());
+        }
+
+        [Test]
+        public void TestGreaterThanOrEqual()
+        {
+            var db = DatabaseHelper.Open();
+            IEnumerable<User> users = db.Users.FindAll(db.Users.Age >= 32).Cast<User>();
+            Assert.AreEqual(3, users.Count());
+        }
+
+        [Test]
+        public void TestLessrThan()
+        {
+            var db = DatabaseHelper.Open();
+            IEnumerable<User> users = db.Users.FindAll(db.Users.Age < 49).Cast<User>();
+            Assert.AreEqual(1, users.Count());
+        }
+
+        [Test]
+        public void TestLessThanOrEqual()
+        {
+            var db = DatabaseHelper.Open();
+            IEnumerable<User> users = db.Users.FindAll(db.Users.Age <= 49).Cast<User>();
+            Assert.AreEqual(3, users.Count());
+        }
+
+        [Test]
+        public void TestLike()
         {
             var db = DatabaseHelper.Open();
             IEnumerable<User> users = db.Users.FindAll(db.Users.Name.Like("Bob")).ToList<User>();
+            Assert.AreEqual(1, users.Count());
+        }
+
+        [Test]
+        public void TestNotEqual()
+        {
+            var db = DatabaseHelper.Open();
+            IEnumerable<User> users = db.Users.FindAll(db.Users.Age != 32).ToList<User>();
+            Assert.AreEqual(2, users.Count());
+        }
+
+        [Test]
+        public void TestOr()
+        {
+            var db = DatabaseHelper.Open();
+            IEnumerable<User> users = db.Users.FindAll(db.Users.Age == 32 | db.Users.Name == "Dave").Cast<User>();
+            Assert.AreEqual(2, users.Count());
+        }
+
+        [Test]
+        public void TestRange()
+        {
+            var db = DatabaseHelper.Open();
+            IEnumerable<User> users = db.Users.FindAllByAge(32.to(48)).Cast<User>();
             Assert.AreEqual(1, users.Count());
         }
 
