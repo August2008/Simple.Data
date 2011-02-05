@@ -73,8 +73,12 @@ namespace Simple.Data.MongoDb
 
         private QueryComplete LikeExpression(SimpleExpression expression)
         {
-            if (!(expression.RightOperand is string)) throw new InvalidOperationException("Cannot use Like on non-string type.");
-            return Query.Matches((string)FormatObject(expression.LeftOperand), new BsonRegularExpression((string)FormatObject(expression.RightOperand)));
+            if (expression.RightOperand is Regex)
+                return Query.Matches((string)FormatObject(expression.LeftOperand), new BsonRegularExpression((Regex)expression.RightOperand));
+            else if (expression.RightOperand is string)
+                return Query.Matches((string)FormatObject(expression.LeftOperand), new BsonRegularExpression((string)FormatObject(expression.RightOperand)));
+
+            throw new InvalidOperationException("Like can only be used with a string or Regex.");
         }
 
         private QueryComplete LogicalExpression(SimpleExpression expression, Func<QueryComplete, QueryComplete, QueryComplete> builder)
