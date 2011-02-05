@@ -31,8 +31,8 @@ namespace Simple.Data.MongoDbTest
 
             var users = new[] 
             {
-                new User { Id = 1, Name = "Bob", Password = "Bob", Age = 32, Address = new Address { Line = "123 Way", City = "Dallas", State = "TX" } },
-                new User { Id = 2, Name = "Charlie", Password = "Charlie", Age = 49, Address = new Address { Line = "234 Way", City = "San Francisco", State = "CA" }  },
+                new User { Id = 1, Name = "Bob", Password = "Bob", Age = 32, Address = new Address { Line = "123 Way", City = "Dallas", State = "TX" }, EmailAddresses = new List<string> { "bob@bob.com", "b@b.com" } },
+                new User { Id = 2, Name = "Charlie", Password = "Charlie", Age = 49, Address = new Address { Line = "234 Way", City = "San Francisco", State = "CA" }, EmailAddresses = new List<string> { "charlie@charlier.com" }  },
                 new User { Id = 3, Name = "Dave", Password = "Dave", Age = 49, Address = new Address { Line = "345 Way", City = "Austin", State = "TX" }  }
             };
 

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Simple.Data.Extensions;
+using System.Collections;
 
 namespace Simple.Data
 {
@@ -54,10 +55,10 @@ namespace Simple.Data
             if (_data.ContainsKey(binder.Name))
             {
                 result = _data[binder.Name];
-                var subRecord = result as HomogenizedKeyDictionary;
-                if (subRecord != null)
-                    result = new SimpleRecord(subRecord);
-
+                var converted = ConvertResult(result);
+                if (!ReferenceEquals(result, converted))
+                    _data[binder.Name] = result = converted;
+                
                 return true;
             }
             if (_tableName == null)
@@ -97,6 +98,23 @@ namespace Simple.Data
         public override IEnumerable<string> GetDynamicMemberNames()
         {
             return _data.Keys.AsEnumerable();
+        }
+
+        private static object ConvertResult(object result)
+        {
+            var subRecord = result as HomogenizedKeyDictionary;
+            if (subRecord != null)
+                return new SimpleRecord(subRecord);
+
+            var subResultSet = result as IList<HomogenizedKeyDictionary>;
+            if (subResultSet != null && result.GetType() != typeof(string))
+                return new SimpleResultSet(subResultSet);
+
+            var list = result as IList<object>;
+            if (list != null)
+                return new SimpleList(list);
+
+            return result;
         }
     }
 }

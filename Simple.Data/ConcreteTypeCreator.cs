@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Simple.Data.Extensions;
+using System.Collections;
 
 namespace Simple.Data
 {
@@ -32,23 +33,22 @@ namespace Simple.Data
 
         public bool TryCreate(IDictionary<string, object> data, out object result)
         {
-            return TryCreate(_concreteType, data, out result);
-        }
-
-        private bool TryCreate(Type concreteType, IDictionary<string, object> data, out object result)
-        {
             bool anyPropertiesSet = false;
-            object obj = Activator.CreateInstance(concreteType);
+            object obj = Activator.CreateInstance(_concreteType);
             object value;
-            foreach (var propertyInfo in concreteType.GetProperties().Where(pi => CanSetProperty(pi, data)))
+            foreach (var propertyInfo in _concreteType.GetProperties().Where(pi => CanSetProperty(pi, data)))
             {
                 value = data[propertyInfo.Name.Homogenize()];
-                var subData = value as IDictionary<string, object>;
-                if (subData != null)
+
+                var subData = value as HomogenizedKeyDictionary;
+                if (subData != null && !ConcreteTypeCreator.Get(propertyInfo.PropertyType).TryCreate(subData, out value))
+                    continue;
+                else if (ConcreteCollectionTypeCreator.IsCollectionType(propertyInfo.PropertyType))
                 {
-                    if (!TryCreate(propertyInfo.PropertyType, subData, out value))
+                    if (!ConcreteCollectionTypeCreator.TryCreate(propertyInfo.PropertyType, (IEnumerable)value, out value))
                         continue;
                 }
+
                 propertyInfo.SetValue(obj, value, null);
                 anyPropertiesSet = true;
             }

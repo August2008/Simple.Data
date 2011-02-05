@@ -18,6 +18,8 @@ namespace Simple.Data.MongoDb
         {
             if (value.IsBsonDocument)
                 return value.AsBsonDocument.ToDictionary();
+            if (value.IsBsonArray)
+                return value.AsBsonArray.Select(v => ConvertValue(v)).ToList();
 
             return value.RawValue;
         }

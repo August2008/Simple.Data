@@ -13,6 +13,8 @@ namespace Simple.Data.MongoDbTest
         public int Age { get; set; }
 
         public Address Address { get; set; }
+
+        public List<string> EmailAddresses { get; set; }
     }
 
     class Address
