@@ -82,6 +82,23 @@ namespace Simple.Data.UnitTest
         }
 
         [Test]
+        public void FunctionCallReturnsSimpleExpressionWithFunctionType()
+        {
+            dynamic column = new DynamicReference("bar", new DynamicReference("foo", new Database(null)));
+
+            SimpleExpression exp = column.BeAwesome(21, "funny");
+
+            Assert.AreSame(column, exp.LeftOperand);
+            Assert.AreEqual(SimpleExpressionType.Function, exp.Type);
+            Assert.IsInstanceOf<SimpleFunction>(exp.RightOperand);
+
+            SimpleFunction func = (SimpleFunction)exp.RightOperand;
+            Assert.AreEqual("BeAwesome", func.Name);
+            Assert.AreEqual(21, func.Args[0]);
+            Assert.AreEqual("funny", func.Args[1]);
+        }
+
+        [Test]
         public void EqualOperatorReturnsSimpleExpressionWithEqualType()
         {
             // Arrange
