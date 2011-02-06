@@ -102,15 +102,15 @@ namespace Simple.Data
 
         private static object ConvertResult(object result)
         {
-            var subRecord = result as HomogenizedKeyDictionary;
+            var subRecord = result as IDictionary<string, object>;
             if (subRecord != null)
                 return new SimpleRecord(subRecord);
 
-            var subResultSet = result as IList<HomogenizedKeyDictionary>;
+            var subResultSet = result as IEnumerable<IDictionary<string, object>>;
             if (subResultSet != null)
                 return new SimpleList(subResultSet.Select(x => new SimpleRecord(x)));
 
-            var list = result as IList<object>;
+            var list = result as IEnumerable<object>;
             if (list != null)
                 return new SimpleList(list);
 

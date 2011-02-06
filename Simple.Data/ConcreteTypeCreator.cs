@@ -47,7 +47,7 @@ namespace Simple.Data
                 }
                 else
                 {
-                    var subData = value as HomogenizedKeyDictionary;
+                    var subData = value as IDictionary<string, object>;
                     if (subData != null && !ConcreteTypeCreator.Get(propertyInfo.PropertyType).TryCreate(subData, out value))
                         continue;
                 }
