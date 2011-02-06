@@ -48,6 +48,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BsonDocumentExtensions.cs" />
+    <Compile Include="DynamicBsonSerializer.cs" />
+    <Compile Include="DynamicSerializationProvider.cs" />
     <Compile Include="ExpressionFormatter.cs" />
     <Compile Include="IDatabaseOpenerExtensions.cs" />
     <Compile Include="IExpressionFormatter.cs" />

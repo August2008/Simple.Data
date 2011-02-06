@@ -19,25 +19,20 @@ namespace Simple.Data.MongoDb
             _expressionFormatter = new ExpressionFormatter();
         }
 
-        public IEnumerable<IDictionary<string, object>> Find(string collectionName, SimpleExpression criteria)
+        public IEnumerable<IDictionary<string, object>> Find(MongoCollection<BsonDocument> collection, SimpleExpression criteria)
         {
-            if (criteria == null) return FindAll(collectionName);
+            if (criteria == null) return FindAll(collection);
 
             var query = _expressionFormatter.Format(criteria);
 
-            var collection = GetCollection(collectionName);
             return collection.Find(query).Select(x => x.ToDictionary());
         }
 
-        public IEnumerable<IDictionary<string, object>> FindAll(string collectionName)
+        public IEnumerable<IDictionary<string, object>> FindAll(MongoCollection<BsonDocument> collection)
         {
-            var collection = GetCollection(collectionName);
             return collection.FindAll().Select(d => d.ToDictionary());
         }
 
-        private MongoCollection<BsonDocument> GetCollection(string collectionName)
-        {
-            return _adapter.GetDatabase().GetCollection(collectionName);
-        }
+
     }
 }

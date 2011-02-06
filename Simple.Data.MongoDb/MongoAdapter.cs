@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 
 using MongoDB.Driver;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 
 namespace Simple.Data.MongoDb
 {
@@ -13,10 +15,17 @@ namespace Simple.Data.MongoDb
     {
         private MongoDatabase _database;
 
-        public MongoAdapter()
+        static MongoAdapter()
         {
-
+            var provider = BsonSerializer.SerializationProvider;
+            if (provider == null)
+                BsonSerializer.SerializationProvider = new DynamicSerializationProvider();
+            else if (!(provider is DynamicSerializationProvider))
+                throw new SimpleDataException("A serialization provider has already been registered.");
         }
+
+        public MongoAdapter()
+        { }
 
         internal MongoAdapter(MongoDatabase database)
         {
@@ -25,12 +34,12 @@ namespace Simple.Data.MongoDb
 
         public override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
-            return new MongoAdapterFinder(this).Find(tableName, criteria);
+            return new MongoAdapterFinder(this).Find(this.GetCollection(tableName), criteria);
         }
 
         public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
         {
-            return new MongoAdapterInserter(this).Insert(tableName, data);
+            return new MongoAdapterInserter(this).Insert(this.GetCollection(tableName), data);
         }
 
         public override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
@@ -59,6 +68,11 @@ namespace Simple.Data.MongoDb
             if (settingsKeys.Contains("ConnectionString"))
                 _database = MongoDatabase.Create(Settings.ConnectionString);
             
+        }
+
+        private MongoCollection<BsonDocument> GetCollection(string collectionName)
+        {
+            return this.GetDatabase().GetCollection(collectionName);
         }
     }
 }

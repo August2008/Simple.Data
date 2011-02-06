@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MongoDB.Driver;
+using MongoDB.Bson;
+using System.Dynamic;
 
 namespace Simple.Data.MongoDb
 {
@@ -15,8 +18,9 @@ namespace Simple.Data.MongoDb
             _adapter = adapter;
         }
 
-        public IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
+        public IDictionary<string, object> Insert(MongoCollection<BsonDocument> collection, IDictionary<string, object> data)
         {
+            var doc = data.ToBsonDocument();
             return null;
         }
     }
