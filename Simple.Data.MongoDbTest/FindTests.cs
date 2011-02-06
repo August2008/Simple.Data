@@ -150,11 +150,25 @@ namespace Simple.Data.MongoDbTest
         }
 
         [Test]
+        public void TestDynamicUsage()
+        {
+            var db = DatabaseHelper.Open();
+            var user = db.Users.FindById(1);
+            Assert.AreEqual(1, user.Id);
+            Assert.AreEqual("Jane", user.Dependents.First().Name);
+            Assert.AreEqual("b@b.com", user.EmailAddresses[1]);
+            Assert.AreEqual("123 Way", user.Address.Line);
+        }
+
+        [Test]
         public void TestImplicitCast()
         {
             var db = DatabaseHelper.Open();
             User user = db.Users.FindById(1);
             Assert.AreEqual(1, user.Id);
+            Assert.AreEqual("Jane", user.Dependents.First().Name);
+            Assert.AreEqual("b@b.com", user.EmailAddresses[1]);
+            Assert.AreEqual("123 Way", user.Address.Line);
         }
 
         [Test]
