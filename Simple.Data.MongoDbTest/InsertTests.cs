@@ -36,7 +36,7 @@ namespace Simple.Data.MongoDbTest
         {
             var db = DatabaseHelper.Open();
 
-            var user = new User { Name = "Zaphod", Password = "zarquon", Age = 42, Address = new Address { State = "TX" } };
+            var user = new User { Id = 4, Name = "Zaphod", Password = "zarquon", Age = 42, Address = new Address { State = "TX" } };
 
             var actual = db.Users.Insert(user);
 
@@ -52,6 +52,7 @@ namespace Simple.Data.MongoDbTest
             var db = DatabaseHelper.Open();
 
             dynamic user = new ExpandoObject();
+            user.Id = 4;
             user.Name = "Marvin";
             user.Password = "diodes";
             user.Age = 42000000;
