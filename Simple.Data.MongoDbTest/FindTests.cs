@@ -161,6 +161,16 @@ namespace Simple.Data.MongoDbTest
         }
 
         [Test]
+        public void TestImplicitCastOfList()
+        {
+            var db = DatabaseHelper.Open();
+            var user = db.Users.FindById(1);
+            List<string> emails = user.EmailAddresses;
+            Assert.AreEqual(2, emails.Count);
+            Assert.AreEqual("b@b.com", emails[1]);
+        }
+
+        [Test]
         public void TestImplicitCast()
         {
             var db = DatabaseHelper.Open();

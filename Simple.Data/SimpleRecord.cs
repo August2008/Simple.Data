@@ -108,7 +108,7 @@ namespace Simple.Data
 
             var subResultSet = result as IList<HomogenizedKeyDictionary>;
             if (subResultSet != null)
-                return new SimpleResultSet(subResultSet.Select(x => new SimpleRecord(x)));
+                return new SimpleList(subResultSet.Select(x => new SimpleRecord(x)));
 
             var list = result as IList<object>;
             if (list != null)
