@@ -12,6 +12,7 @@ namespace Simple.Data
     {
         private static readonly List<Creator> _creators = new List<Creator>
         {
+            new GenericSetCreator(),
             new GenericListCreator(),
             new NonGenericListCreator()
         };
@@ -138,7 +139,7 @@ namespace Simple.Data
 
         private class GenericListCreator : Creator
         {
-            private static readonly Type OpenListType = typeof(List<>);
+            private static readonly Type _openListType = typeof(List<>);
 
             public override bool IsCollectionType(Type type)
             {
@@ -159,12 +160,48 @@ namespace Simple.Data
             {
                 result = null;
                 var elementType = GetElementType(type);
-                var listType = OpenListType.MakeGenericType(elementType);
+                var listType = _openListType.MakeGenericType(elementType);
                 Array elements;
                 if (!TryConvertElements(elementType, items, out elements))
                     return false;
 
                 result = Activator.CreateInstance(listType, elements);
+                return true;
+            }
+
+            private Type GetElementType(Type type)
+            {
+                return type.GetGenericArguments()[0];
+            }
+        }
+
+        private class GenericSetCreator : Creator
+        {
+            private static readonly Type _openSetType = typeof(HashSet<>);
+
+            public override bool IsCollectionType(Type type)
+            {
+                if (!type.IsGenericType)
+                    return false;
+
+                var genericTypeDef = type.GetGenericTypeDefinition();
+                if (genericTypeDef.GetGenericArguments().Length != 1)
+                    return false;
+
+                return genericTypeDef == typeof(ISet<>) ||
+                       genericTypeDef == typeof(HashSet<>);
+            }
+
+            public override bool TryCreate(Type type, IEnumerable items, out object result)
+            {
+                result = null;
+                var elementType = GetElementType(type);
+                var setType = _openSetType.MakeGenericType(elementType);
+                Array elements;
+                if (!TryConvertElements(elementType, items, out elements))
+                    return false;
+
+                result = Activator.CreateInstance(setType, elements);
                 return true;
             }
 

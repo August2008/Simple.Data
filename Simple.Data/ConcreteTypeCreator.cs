@@ -40,12 +40,15 @@ namespace Simple.Data
             {
                 value = data[propertyInfo.Name.Homogenize()];
 
-                var subData = value as HomogenizedKeyDictionary;
-                if (subData != null && !ConcreteTypeCreator.Get(propertyInfo.PropertyType).TryCreate(subData, out value))
-                    continue;
-                else if (ConcreteCollectionTypeCreator.IsCollectionType(propertyInfo.PropertyType))
+                if (ConcreteCollectionTypeCreator.IsCollectionType(propertyInfo.PropertyType))
                 {
                     if (!ConcreteCollectionTypeCreator.TryCreate(propertyInfo.PropertyType, (IEnumerable)value, out value))
+                        continue;
+                }
+                else
+                {
+                    var subData = value as HomogenizedKeyDictionary;
+                    if (subData != null && !ConcreteTypeCreator.Get(propertyInfo.PropertyType).TryCreate(subData, out value))
                         continue;
                 }
 
