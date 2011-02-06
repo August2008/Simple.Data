@@ -49,9 +49,13 @@
   <ItemGroup>
     <Compile Include="BsonDocumentExtensions.cs" />
     <Compile Include="ExpressionFormatter.cs" />
+    <Compile Include="IDatabaseOpenerExtensions.cs" />
     <Compile Include="IExpressionFormatter.cs" />
     <Compile Include="MongoAdapter.cs" />
     <Compile Include="MongoAdapterFinder.cs" />
+    <Compile Include="MongoAdapterInserter.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -6,13 +6,15 @@ using System.Text;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 
+using Simple.Data.MongoDb;
+
 namespace Simple.Data.MongoDbTest
 {
     internal static class DatabaseHelper
     {
         public static dynamic Open()
         {
-            return Database.Opener.Open("MongoDb", new { ConnectionString = "mongodb://localhost/simpleDataTests" });
+            return Database.Opener.OpenMongo("mongodb://localhost/simpleDataTests");
         }
 
         public static void Reset()

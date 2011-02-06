@@ -5,53 +5,134 @@ using System.Linq;
 using System.Text;
 
 using Simple.Data.Extensions;
+using System.Collections;
 
 namespace Simple.Data
 {
-    public class SimpleList : List<object>
+    public class SimpleList : DynamicObject, IList<object>
     {
+        private readonly List<object> _innerList;
+
+        public object this[int index]
+        {
+            get { return _innerList[index]; }
+            set { _innerList[index] = value; }
+        }
+
+        public int Count
+        {
+            get { return _innerList.Count; }
+        }
+
+        public bool IsReadOnly
+        {
+            get { return false; }
+        }
+
         public SimpleList(IEnumerable<object> other)
-            : base(other)
-        { }
+        {
+            _innerList = new List<object>(other);
+        }
+
+        public void Add(object item)
+        {
+            _innerList.Add(item);
+        }
+
+        public void Clear()
+        {
+            _innerList.Clear();
+        }
+
+        public bool Contains(object item)
+        {
+            return _innerList.Contains(item);
+        }
+
+        public void CopyTo(object[] array, int arrayIndex)
+        {
+            _innerList.CopyTo(array, arrayIndex);
+        }
+
+        public int IndexOf(object item)
+        {
+            return _innerList.IndexOf(item);
+        }
+
+        public void Insert(int index, object item)
+        {
+            _innerList.Insert(index, item);
+        }
+
+        public void RemoveAt(int index)
+        {
+            _innerList.RemoveAt(index);
+        }
+
+        public bool Remove(object item)
+        {
+            return _innerList.Remove(item);
+        }
+
+        public IEnumerator<object> GetEnumerator()
+        {
+            return _innerList.GetEnumerator();
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return ((IEnumerable)_innerList).GetEnumerator();
+        }
 
         public dynamic ElementAt(int index)
         {
-            return Enumerable.ElementAt(this, index);
+            return _innerList.ElementAt(index);
         }
 
         public dynamic ElementAtOrDefault(int index)
         {
-            return Enumerable.ElementAtOrDefault(this, index);
+            return _innerList.ElementAtOrDefault(index);
         }
 
         public dynamic First()
         {
-            return Enumerable.First(this);
+            return _innerList.First();
         }
 
         public dynamic FirstOrDefault()
         {
-            return Enumerable.FirstOrDefault(this);
+            return _innerList.FirstOrDefault();
         }
 
         public dynamic Last()
         {
-            return Enumerable.Last(this);
+            return _innerList.Last();
         }
 
         public dynamic LastOrDefault()
         {
-            return Enumerable.LastOrDefault(this);
+            return _innerList.LastOrDefault();
         }
 
         public dynamic Single()
         {
-            return Enumerable.Single(this);
+            return _innerList.Single();
         }
 
         public dynamic SingleOrDefault()
         {
-            return Enumerable.SingleOrDefault(this);
+            return _innerList.SingleOrDefault();
+        }
+
+        public override bool TryConvert(ConvertBinder binder, out object result)
+        {
+            if (ConcreteCollectionTypeCreator.IsCollectionType(binder.Type))
+            {
+                if (ConcreteCollectionTypeCreator.TryCreate(binder.Type, this, out result))
+                    return true;
+            }
+       
+            return base.TryConvert(binder, out result);
         }
     }
 }

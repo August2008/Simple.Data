@@ -165,9 +165,9 @@ namespace Simple.Data.MongoDbTest
         {
             var db = DatabaseHelper.Open();
             var user = db.Users.FindById(1);
-            List<string> emails = user.EmailAddresses;
-            Assert.AreEqual(2, emails.Count);
-            Assert.AreEqual("b@b.com", emails[1]);
+            IEnumerable<string> emails = user.EmailAddresses;
+            Assert.AreEqual(2, emails.Count());
+            Assert.AreEqual("b@b.com", emails.ElementAt(1));
         }
 
         [Test]

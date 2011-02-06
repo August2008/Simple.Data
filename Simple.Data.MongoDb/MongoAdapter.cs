@@ -30,7 +30,7 @@ namespace Simple.Data.MongoDb
 
         public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
         {
-            throw new NotImplementedException();
+            return new MongoAdapterInserter(this).Insert(tableName, data);
         }
 
         public override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
