@@ -218,10 +218,22 @@ namespace Simple.Data
             var dict = value as IDictionary<string, object>;
             if (dict != null)
                 return new HomogenizedKeyDictionary(dict);
-            var list = value as IList<IDictionary<string, object>>;
+            var list = value as IList<object>;
             if (list != null)
-                return list.Select(i => new HomogenizedKeyDictionary(i)).ToList();
-            
+            {
+                var newList = new List<HomogenizedKeyDictionary>();
+                for (int i = 0; i < list.Count; i++)
+                {
+                    var element = list[i] as IDictionary<string, object>;
+                    if (element != null)
+                        newList.Add(new HomogenizedKeyDictionary(element));
+                    else
+                        return list;
+                }
+
+                return newList;
+            }
+
             return value == DBNull.Value ? null : value;
         }
     }

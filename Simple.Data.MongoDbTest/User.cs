@@ -15,6 +15,8 @@ namespace Simple.Data.MongoDbTest
         public Address Address { get; set; }
 
         public List<string> EmailAddresses { get; set; }
+
+        public List<Dependent> Dependents { get; set; }
     }
 
     class Address
@@ -24,4 +26,9 @@ namespace Simple.Data.MongoDbTest
         public string State { get; set; }
     }
 
+    class Dependent
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+    }
 }
