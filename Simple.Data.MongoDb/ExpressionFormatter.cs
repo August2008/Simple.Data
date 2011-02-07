@@ -14,17 +14,23 @@ namespace Simple.Data.MongoDb
 {
     class ExpressionFormatter : IExpressionFormatter
     {
-        private static readonly Dictionary<string, Func<DynamicReference, SimpleFunction, QueryComplete>> _supportedFunctions =
-            new Dictionary<string, Func<DynamicReference, SimpleFunction, QueryComplete>>(StringComparer.InvariantCultureIgnoreCase)
+        private readonly Dictionary<string, Func<DynamicReference, SimpleFunction, QueryComplete>> _supportedFunctions;
+            
+
+        private readonly MongoAdapter _adapter;
+
+        public ExpressionFormatter(MongoAdapter adapter)
+        {
+            _adapter = adapter;
+
+            _supportedFunctions = new Dictionary<string, Func<DynamicReference, SimpleFunction, QueryComplete>>(StringComparer.InvariantCultureIgnoreCase)
             {
                 { "like", HandleLike },
                 { "startswith", HandleStartsWith },
                 { "contains", HandleContains },
                 { "endswith", HandleEndsWith }
             };
-
-        public ExpressionFormatter()
-        { }
+        }
 
         public QueryComplete Format(SimpleExpression expression)
         {
@@ -115,7 +121,7 @@ namespace Simple.Data.MongoDb
             return Query.NE(fieldName, BsonValue.Create(FormatObject(expression.RightOperand)));
         }
 
-        private static object FormatObject(object operand)
+        private object FormatObject(object operand)
         {
             var reference = operand as DynamicReference;
             if (!ReferenceEquals(reference, null))
@@ -125,14 +131,14 @@ namespace Simple.Data.MongoDb
             return operand;
         }
 
-        private static string GetFullDynamicReference(DynamicReference reference)
+        private string GetFullDynamicReference(DynamicReference reference)
         {
             var names = new Stack<string>();
             string name;
             while(!ReferenceEquals(reference.GetOwner(), null))
             {
                 name = reference.GetName();
-                name = name == "Id" ? "_id" : name;
+                name = name == "Id" || name == "id" ? "_id" : name;
                 names.Push(name);
                 
                 reference = reference.GetOwner();
@@ -140,7 +146,7 @@ namespace Simple.Data.MongoDb
             return string.Join(".", names.ToArray());
         }
 
-        private static QueryComplete HandleLike(DynamicReference reference, SimpleFunction function)
+        private QueryComplete HandleLike(DynamicReference reference, SimpleFunction function)
         {
             if (function.Args[0] is Regex)
                 return Query.Matches((string)FormatObject(reference), new BsonRegularExpression((Regex)function.Args[0]));
@@ -150,21 +156,21 @@ namespace Simple.Data.MongoDb
             throw new InvalidOperationException("Like can only be used with a string or Regex.");
         }
 
-        private static QueryComplete HandleStartsWith(DynamicReference reference, SimpleFunction function)
+        private QueryComplete HandleStartsWith(DynamicReference reference, SimpleFunction function)
         {
             if(!(function.Args[0] is string)) throw new InvalidOperationException("StartsWith can only be used with a string.");
          
             return Query.Matches((string)FormatObject(reference), new BsonRegularExpression("^" + (string)function.Args[0] + ".*"));
         }
 
-        private static QueryComplete HandleContains(DynamicReference reference, SimpleFunction function)
+        private QueryComplete HandleContains(DynamicReference reference, SimpleFunction function)
         {
             if (!(function.Args[0] is string)) throw new InvalidOperationException("StartsWith can only be used with a string.");
 
             return Query.Matches((string)FormatObject(reference), new BsonRegularExpression("^.*" + (string)function.Args[0] + ".*$"));
         }
 
-        private static QueryComplete HandleEndsWith(DynamicReference reference, SimpleFunction function)
+        private QueryComplete HandleEndsWith(DynamicReference reference, SimpleFunction function)
         {
             if (!(function.Args[0] is string)) throw new InvalidOperationException("StartsWith can only be used with a string.");
 

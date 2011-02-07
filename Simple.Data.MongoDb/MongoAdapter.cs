@@ -14,6 +14,7 @@ namespace Simple.Data.MongoDb
     internal class MongoAdapter : Adapter
     {
         private MongoDatabase _database;
+        private readonly IExpressionFormatter _expressionFormatter;
 
         static MongoAdapter()
         {
@@ -25,16 +26,19 @@ namespace Simple.Data.MongoDb
         }
 
         public MongoAdapter()
-        { }
+        {
+            _expressionFormatter = new ExpressionFormatter(this);
+        }
 
         internal MongoAdapter(MongoDatabase database)
+            : this()
         {
             _database = database;
         }
 
         public override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
-            return new MongoAdapterFinder(this).Find(GetCollection(tableName), criteria);
+            return new MongoAdapterFinder(this, _expressionFormatter).Find(GetCollection(tableName), criteria);
         }
 
         public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
@@ -44,12 +48,12 @@ namespace Simple.Data.MongoDb
 
         public override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
         {
-            throw new NotImplementedException();
+            return new MongoAdapterUpdater(this, _expressionFormatter).Update(GetCollection(tableName), data, criteria);
         }
 
         public override int Delete(string tableName, SimpleExpression criteria)
         {
-            return new MongoAdapterDeleter(this).Delete(GetCollection(tableName), criteria);
+            return new MongoAdapterDeleter(this, _expressionFormatter).Delete(GetCollection(tableName), criteria);
         }
 
         public override IEnumerable<string> GetKeyFieldNames(string tableName)

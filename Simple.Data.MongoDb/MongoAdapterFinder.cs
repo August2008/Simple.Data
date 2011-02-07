@@ -12,11 +12,11 @@ namespace Simple.Data.MongoDb
         private readonly MongoAdapter _adapter;
         private readonly IExpressionFormatter _expressionFormatter;
 
-        public MongoAdapterFinder(MongoAdapter adapter)
+        public MongoAdapterFinder(MongoAdapter adapter, IExpressionFormatter expressionFormatter)
         {
             if (adapter == null) throw new ArgumentNullException("adapter");
             _adapter = adapter;
-            _expressionFormatter = new ExpressionFormatter();
+            _expressionFormatter = expressionFormatter;
         }
 
         public IEnumerable<IDictionary<string, object>> Find(MongoCollection<BsonDocument> collection, SimpleExpression criteria)
