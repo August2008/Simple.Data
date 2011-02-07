@@ -19,7 +19,7 @@ namespace Simple.Data.MongoDbTest
 
         public static dynamic Open()
         {
-            return Database.Opener.OpenMongo("mongodb://localhost/simpleDataTests");
+            return Database.Opener.OpenMongo("mongodb://localhost/simpleDataTests?safe=true");
         }
 
         public static void Reset()

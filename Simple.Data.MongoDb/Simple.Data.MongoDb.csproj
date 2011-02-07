@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BsonDocumentExtensions.cs" />
+    <Compile Include="MongoAdapterDeleter.cs" />
     <Compile Include="DynamicBsonSerializer.cs" />
     <Compile Include="DynamicSerializationProvider.cs" />
     <Compile Include="ExpressionFormatter.cs" />

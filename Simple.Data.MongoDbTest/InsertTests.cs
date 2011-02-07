@@ -10,7 +10,7 @@ namespace Simple.Data.MongoDbTest
     [TestFixture]
     public class InsertTests
     {
-        [TestFixtureSetUp]
+        [SetUp]
         public void Setup()
         {
             DatabaseHelper.Reset();

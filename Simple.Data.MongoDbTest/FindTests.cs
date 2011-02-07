@@ -62,7 +62,7 @@ namespace Simple.Data.MongoDbTest
         }
 
         [Test]
-        public void TestLessrThan()
+        public void TestLessThan()
         {
             var db = DatabaseHelper.Open();
             IEnumerable<User> users = db.Users.FindAll(db.Users.Age < 49).Cast<User>();

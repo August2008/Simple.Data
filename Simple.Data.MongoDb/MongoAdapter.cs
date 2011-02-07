@@ -34,12 +34,12 @@ namespace Simple.Data.MongoDb
 
         public override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
-            return new MongoAdapterFinder(this).Find(this.GetCollection(tableName), criteria);
+            return new MongoAdapterFinder(this).Find(GetCollection(tableName), criteria);
         }
 
         public override IDictionary<string, object> Insert(string tableName, IDictionary<string, object> data)
         {
-            return new MongoAdapterInserter(this).Insert(this.GetCollection(tableName), data);
+            return new MongoAdapterInserter(this).Insert(GetCollection(tableName), data);
         }
 
         public override int Update(string tableName, IDictionary<string, object> data, SimpleExpression criteria)
@@ -49,7 +49,7 @@ namespace Simple.Data.MongoDb
 
         public override int Delete(string tableName, SimpleExpression criteria)
         {
-            throw new NotImplementedException();
+            return new MongoAdapterDeleter(this).Delete(GetCollection(tableName), criteria);
         }
 
         public override IEnumerable<string> GetKeyFieldNames(string tableName)
