@@ -22,6 +22,7 @@ namespace Simple.Data.MongoDbTest
             var db = DatabaseHelper.Open();
 
             int recordsAffected = db.Users.DeleteById(2);
+            Assert.AreEqual(1, recordsAffected);
         }
 
         [Test]
@@ -29,7 +30,8 @@ namespace Simple.Data.MongoDbTest
         {
             var db = DatabaseHelper.Open();
 
-            db.Users.Delete(Age: 49);
+            int recordsAffected = db.Users.Delete(Age: 49);
+            Assert.AreEqual(2, recordsAffected);
         }
     }
 }

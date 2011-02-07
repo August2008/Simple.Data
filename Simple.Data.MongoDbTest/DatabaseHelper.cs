@@ -24,7 +24,7 @@ namespace Simple.Data.MongoDbTest
 
         public static void Reset()
         {
-            var server = MongoServer.Create("mongodb://localhost/");
+            var server = MongoServer.Create("mongodb://localhost/?safe=true");
             server.Connect();
             server.DropDatabase("simpleDataTests");
             InsertData(server.GetDatabase("simpleDataTests"));
