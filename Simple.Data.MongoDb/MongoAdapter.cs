@@ -30,12 +30,6 @@ namespace Simple.Data.MongoDb
             _expressionFormatter = new ExpressionFormatter(this);
         }
 
-        internal MongoAdapter(MongoDatabase database)
-            : this()
-        {
-            _database = database;
-        }
-
         public override IEnumerable<IDictionary<string, object>> Find(string tableName, SimpleExpression criteria)
         {
             return new MongoAdapterFinder(this, _expressionFormatter).Find(GetCollection(tableName), criteria);
@@ -71,7 +65,11 @@ namespace Simple.Data.MongoDb
             var settingsKeys = ((IDictionary<string, object>)Settings).Keys;
             if (settingsKeys.Contains("ConnectionString"))
                 _database = MongoDatabase.Create(Settings.ConnectionString);
-            
+            else if (settingsKeys.Contains("Settings"))
+                _database = MongoDatabase.Create(Settings.Settings, Settings.DatabaseName);
+
+            if (_database == null)
+                throw new SimpleDataException("Invalid setup for MongoDb. Either a ConnectionString should be provided, or MongoServerSettings and a DatabaseName");
         }
 
         private MongoCollection<BsonDocument> GetCollection(string collectionName)

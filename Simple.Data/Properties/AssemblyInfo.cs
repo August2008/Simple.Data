@@ -13,8 +13,6 @@ using System.Runtime.InteropServices;
 
 [assembly: InternalsVisibleTo("Simple.Data.Ado")]
 [assembly: InternalsVisibleTo("Simple.Data.AdapterApi")]
-[assembly: InternalsVisibleTo("Simple.Data.MongoDb")]
-[assembly: InternalsVisibleTo("Simple.Data.MongoDbTest")]
 [assembly: InternalsVisibleTo("Simple.Data.UnitTest")]
 [assembly: InternalsVisibleTo("Simple.Data.IntegrationTest")]
 [assembly: InternalsVisibleTo("Simple.Data.SqlCeTest")]
